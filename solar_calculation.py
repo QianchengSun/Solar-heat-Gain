@@ -7,6 +7,7 @@ Created on Tue May 18 19:52:38 2021
 """
 
 import numpy as np
+import numpy as np
 
 #%%
 # Day of the year
@@ -313,16 +314,16 @@ def Beam_solar_radiation_east(month, day, latitude, H_bar, SolarTime, SolarAltit
 # Calculate beam solar radiation (west)
 def Beam_solar_radiation_west(month, day, latitude, H_bar, SolarTime, SolarAltitudeAngle, SolarIncidenceAngle_west,TiltAngle_deg_west,n):
     omega_deg = Sunset_Angle(month, day, latitude)
-    omega_rad = np.radians(omega_deg)
-    HourAngle_rad = np.radians(Hour_angle(SolarTime))
-    Solar_Incidence_Angle_west_rad = np.radians(SolarIncidenceAngle_west)
-    SolarZeinthAngle_rad = np.radians(90 - SolarAltitudeAngle)
+    omega_rad = math.radians(omega_deg)
+    HourAngle_rad = math.radians(Hour_angle(SolarTime))
+    Solar_Incidence_Angle_west_rad = math.radians(SolarIncidenceAngle_west)
+    SolarZeinthAngle_rad = math.radians(90 - SolarAltitudeAngle)
     
-    r_b = np.cos(Solar_Incidence_Angle_west_rad)/np.cos(SolarZeinthAngle_rad)
+    r_b = math.cos(Solar_Incidence_Angle_west_rad)/math.cos(SolarZeinthAngle_rad)
     if HourAngle_rad < - omega_rad or HourAngle_rad > omega_rad:
         r_d = 0
     else:
-        r_d = np.pi/24 * (np.cos(HourAngle_rad) - np.cos(omega_rad)) / (np.sin(omega_rad) - omega_rad * np.cos(omega_rad))
+        r_d = pi/24 * (math.cos(HourAngle_rad) - math.cos(omega_rad)) / (math.sin(omega_rad) - omega_rad * math.cos(omega_rad))
     
     H_bar_d_0_west = H_bar_d_west(month, day, latitude, H_bar, TiltAngle_deg_west, n)
     I_bar_d_horizontal_west = r_d * H_bar_d_0_west
