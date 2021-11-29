@@ -1,7 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Tue May 18 19:52:38 2021
+Description: 
+
+    The function edit is based on Dr. Chiasson's RCL 561 Solar Energy Engineering class in University of Dayton.
+
+    The function is used to calculate the solar radiation on an object for every minutes.
+
+How to use :
+    Here is an example code for how to use all the functions as a package in python.
+
+Example code : 
+
+import sys
+package_path = r"/Users/qianchengsun/PhD/github/Solar-heat-Gain"
+sys.path.append(package_path)
+import solar_calculation as sc
+
+Created on Tue May 18, 2021
+Recent update on Nov 29, 2021
 
 @author: qianchengsun
 """
@@ -11,33 +28,37 @@ import numpy as np
 #%%
 # Day of the year
 def day_of_year(month, day):
-    if month == 1:
-        n = day
-    elif month == 2 :
-        n = 31 + day
-    elif month == 3 :
-        n =  59 + day
-    elif month == 4 :
-        n = 90 + day 
-    elif month == 5 :
-        n = 120 + day 
-    elif month == 6 :
-        n = 151 + day 
-    elif month == 7 :
-        n = 181 + day 
-    elif month == 8 :
-        n = 212 + day
-    elif month == 9 :
-        n = 243 + day
-    elif month == 10 :
-        n = 273 + day
-    elif month == 11 :
-        n = 304 + day
-    elif month == 12 :
-        n = 304 + day
-    else:
-        n = 334 + day
-    return n 
+    n_list = []
+    for i in range(0, len(month)):
+        if month[i] == 1:
+            n = day[i]
+        elif month[i] == 2 :
+            n = 31 + day[i]
+        elif month[i] == 3 :
+            n =  59 + day[i]
+        elif month[i] == 4 :
+            n = 90 + day[i] 
+        elif month[i] == 5 :
+            n = 120 + day[i] 
+        elif month[i] == 6 :
+            n = 151 + day[i] 
+        elif month[i] == 7 :
+            n = 181 + day[i] 
+        elif month[i] == 8 :
+            n = 212 + day[i]
+        elif month[i] == 9 :
+            n = 243 + day[i]
+        elif month[i] == 10 :
+            n = 273 + day[i]
+        elif month[i] == 11 :
+            n = 304 + day[i]
+        elif month[i] == 12 :
+            n = 304 + day[i]
+        else:
+            n = 334 + day[i]
+
+        n_list.append(n)
+    return n_list 
 
 # Equation of time 
 def equation_of_time(n):
@@ -65,7 +86,7 @@ def Sunset_Angle(month, day, latitude):
     Delta_deg = Declination_Angle(n)
     delta_rad = np.radians(Delta_deg)
     Lat_rad = np.radians(latitude)
-    SunsetAngle = np.degrees(np.acos(-np.tan(Lat_rad) * np.tan(delta_rad)))
+    SunsetAngle = np.degrees(np.arccos(-np.tan(Lat_rad) * np.tan(delta_rad)))
     return SunsetAngle
 
 # Hour Angle 
@@ -101,9 +122,9 @@ def Solar_azimuth_angle(latitude, DeclinationAngle, SolarTime, SolarAltitudeAngl
     lat_rad = np.radians(latitude)
     delta_rad = np.radians(DeclinationAngle)
     if SolarTime > 12:
-        SolarAzimuthAngle = np.rad2deg(np.acos((np.sin(Solar_alitude_angle_rad) * np.sin(lat_rad) - np.sin(delta_rad)) / (np.cos(Solar_alitude_angle_rad) * np.cos(lat_rad))))
+        SolarAzimuthAngle = np.rad2deg(np.arccos((np.sin(Solar_alitude_angle_rad) * np.sin(lat_rad) - np.sin(delta_rad)) / (np.cos(Solar_alitude_angle_rad) * np.cos(lat_rad))))
     else:
-        SolarAzimuthAngle = np.rad2deg(np.acos((np.sin(Solar_alitude_angle_rad) * np.sin(lat_rad) - np.sin(delta_rad)) / (np.cos(Solar_alitude_angle_rad) * np.cos(lat_rad))))* -1
+        SolarAzimuthAngle = np.rad2deg(np.arccos((np.sin(Solar_alitude_angle_rad) * np.sin(lat_rad) - np.sin(delta_rad)) / (np.cos(Solar_alitude_angle_rad) * np.cos(lat_rad))))* -1
     return SolarAzimuthAngle 
 #%%
 
@@ -118,7 +139,7 @@ def Solar_incidence_angle_south(SurfaceAzimuthAngle_south, TiltAngle_deg_south, 
     SolarAltitudeAngle_rad = np.radians(SolarAltitudeAngle_deg)
     SurfaceSolarAzimuth_south_rad = np.radians(SolarAzimuthAngle - SurfaceAzimuthAngle_south)
     TiltAngle_south_rad = np.radians(TiltAngle_deg_south)
-    SolarIncidenceAngle_south = np.rad2deg(np.acos(SolarAltitudeAngle_rad * np.cos(SurfaceSolarAzimuth_south_rad) * np.sin(TiltAngle_south_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_south_rad)))
+    SolarIncidenceAngle_south = np.rad2deg(np.arccos(SolarAltitudeAngle_rad * np.cos(SurfaceSolarAzimuth_south_rad) * np.sin(TiltAngle_south_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_south_rad)))
     if SolarIncidenceAngle_south < 90:
         SolarIncidenceAngle_south = SolarIncidenceAngle_south
     else:
@@ -130,7 +151,7 @@ def Solar_incidence_angle_north(SurfaceAzimuthAngle_north, TiltAngle_deg_north, 
     SolarAltitudeAngle_rad = np.radians(SolarAltitudeAngle_deg)
     SurfaceSolarAzimuth_north_rad = np.radians(SolarAzimuthAngle - SurfaceAzimuthAngle_north)
     TiltAngle_north_rad = np.radians(TiltAngle_deg_north)
-    SolarIncidenceAngle_north = np.rad2deg(np.acos(SolarAltitudeAngle_rad * np.cos(SurfaceSolarAzimuth_north_rad) * np.sin(TiltAngle_north_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_north_rad)))
+    SolarIncidenceAngle_north = np.rad2deg(np.arccos(SolarAltitudeAngle_rad * np.cos(SurfaceSolarAzimuth_north_rad) * np.sin(TiltAngle_north_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_north_rad)))
     if SolarIncidenceAngle_north < 90:
         SolarIncidenceAngle_north = SolarIncidenceAngle_north
     else:
@@ -142,7 +163,7 @@ def Solar_incidence_angle_east(SurfaceAzimuthAngle_east, TiltAngle_deg_east, Sol
     SolarAltitudeAngle_rad = np.radians(SolarAltitudeAngle_deg)
     SurfaceSolarAzimuth_east_rad = np.radians(SolarAzimuthAngle - SurfaceAzimuthAngle_east)
     TiltAngle_east_rad = np.radians(TiltAngle_deg_east)
-    SolarIncidenceAngle_east = np.rad2deg(np.acos(SolarAltitudeAngle_rad * np.cos(SurfaceSolarAzimuth_east_rad) * np.sin(TiltAngle_east_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_east_rad)))
+    SolarIncidenceAngle_east = np.rad2deg(np.arccos(SolarAltitudeAngle_rad * np.cos(SurfaceSolarAzimuth_east_rad) * np.sin(TiltAngle_east_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_east_rad)))
     if SolarIncidenceAngle_east < 90:
         SolarIncidenceAngle_east = SolarIncidenceAngle_east
     else:
@@ -154,7 +175,7 @@ def Solar_incidence_angle_west(SurfaceAzimuthAngle_west, TiltAngle_deg_west, Sol
     SolarAltitudeAngle_rad = np.radians(SolarAltitudeAngle_deg)
     SurfaceSolarAzimuth_west_rad = np.radians(SolarAzimuthAngle - SurfaceAzimuthAngle_west)
     TiltAngle_west_rad = np.radians(TiltAngle_deg_west)
-    SolarIncidenceAngle_west = np.rad2deg(np.acos(SolarAltitudeAngle_rad * np.cos(SurfaceSolarAzimuth_west_rad) * np.sin(TiltAngle_west_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_west_rad)))
+    SolarIncidenceAngle_west = np.rad2deg(np.arccos(SolarAltitudeAngle_rad * np.cos(SurfaceSolarAzimuth_west_rad) * np.sin(TiltAngle_west_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_west_rad)))
     if SolarIncidenceAngle_west < 90:
         SolarIncidenceAngle_west = SolarIncidenceAngle_west
     else:
