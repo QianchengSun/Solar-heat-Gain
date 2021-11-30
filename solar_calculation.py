@@ -117,8 +117,8 @@ def Solar_radiation_on_horizontal_GHI(month, day, latitude, H_bar, SolarTime):
 def Solar_alitude_angle(latitude, DeclinationAngle, SolarTime):
     lat_rad = np.radians(latitude)
     delta_rad = np.radians(DeclinationAngle)
-    Hour_angle_rad = np.radians(SolarTime)
-    SolarAltitudeAngle = np.rad2deg(np.arcsin(np.cos(lat_rad) * np.cos(Hour_angle_rad) + np.sin(lat_rad) * np.sin(delta_rad)))
+    Hour_angle_rad = np.radians(Hour_angle(SolarTime))
+    SolarAltitudeAngle = np.rad2deg(np.arcsin(np.cos(lat_rad) * np.cos(delta_rad) * np.cos(Hour_angle_rad) + np.sin(lat_rad) * np.sin(delta_rad)))
     return SolarAltitudeAngle
 
 # Solar Azimuth Angle
@@ -132,58 +132,87 @@ def Solar_azimuth_angle(latitude, DeclinationAngle, SolarTime, SolarAltitudeAngl
         if SolarTime_array[i] > 12:
             SolarAzimuthAngle = np.rad2deg(np.arccos((np.sin(Solar_alitude_angle_rad) * np.sin(lat_rad) - np.sin(delta_rad)) / (np.cos(Solar_alitude_angle_rad) * np.cos(lat_rad))))
         else:
-            SolarAzimuthAngle = np.rad2deg(np.arccos((np.sin(Solar_alitude_angle_rad) * np.sin(lat_rad) - np.sin(delta_rad)) / (np.cos(Solar_alitude_angle_rad) * np.cos(lat_rad))))* (-1)
-    SolarAzimuthAngle_list.append(SolarAzimuthAngle)
+            SolarAzimuthAngle = np.rad2deg(np.arccos((np.sin(Solar_alitude_angle_rad) * np.sin(lat_rad) - np.sin(delta_rad)) / (np.cos(Solar_alitude_angle_rad) * np.cos(lat_rad)))) * (-1)
+
+        SolarAzimuthAngle_list.append(SolarAzimuthAngle)
     return SolarAzimuthAngle_list
 
 
 # Solar Incidence Angle South 
-def Solar_incidence_angle_south(SurfaceAzimuthAngle_south, TiltAngle_deg_south, SolarAltitudeAngle_deg, SolarAzimuthAngle, n):
-    SolarAltitudeAngle_rad = np.radians(SolarAltitudeAngle_deg)
-    SurfaceSolarAzimuth_south_rad = np.radians(SolarAzimuthAngle - SurfaceAzimuthAngle_south)
+def Solar_incidence_angle_south(SurfaceAzimuthAngle_south, TiltAngle_deg_south, SolarAltitudeAngle_deg, SolarAzimuthAngle):
     TiltAngle_south_rad = np.radians(TiltAngle_deg_south)
-    SolarIncidenceAngle_south = np.rad2deg(np.arccos(SolarAltitudeAngle_rad * np.cos(SurfaceSolarAzimuth_south_rad) * np.sin(TiltAngle_south_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_south_rad)))
-    if SolarIncidenceAngle_south < 90:
-        SolarIncidenceAngle_south = SolarIncidenceAngle_south
-    else:
-        SolarIncidenceAngle_south = 90
-    return SolarIncidenceAngle_south
+    SolarIncidenceAngle_south_list = []
+    for i in range(0, len(SolarAltitudeAngle_deg)):
+
+        SurfaceSolarAzimuth_south_rad = np.radians(SolarAzimuthAngle[i] - SurfaceAzimuthAngle_south)
+
+        SolarAltitudeAngle_rad = np.radians(SolarAltitudeAngle_deg[i])
+        
+        SolarIncidenceAngle_south = np.rad2deg(np.arccos(np.cos(SolarAltitudeAngle_rad) * np.cos(SurfaceSolarAzimuth_south_rad) * np.sin(TiltAngle_south_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_south_rad))) 
+
+        if SolarIncidenceAngle_south < 90:
+            SolarIncidenceAngle_south = SolarIncidenceAngle_south
+        else:
+            SolarIncidenceAngle_south = 90
+
+        SolarIncidenceAngle_south_list.append(SolarIncidenceAngle_south)
+
+    return SolarIncidenceAngle_south_list
 
 # Solar Incidence Angle North
-def Solar_incidence_angle_north(SurfaceAzimuthAngle_north, TiltAngle_deg_north, SolarAltitudeAngle_deg, SolarAzimuthAngle, n):
-    SolarAltitudeAngle_rad = np.radians(SolarAltitudeAngle_deg)
-    SurfaceSolarAzimuth_north_rad = np.radians(SolarAzimuthAngle - SurfaceAzimuthAngle_north)
+def Solar_incidence_angle_north(SurfaceAzimuthAngle_north, TiltAngle_deg_north, SolarAltitudeAngle_deg, SolarAzimuthAngle):
     TiltAngle_north_rad = np.radians(TiltAngle_deg_north)
-    SolarIncidenceAngle_north = np.rad2deg(np.arccos(SolarAltitudeAngle_rad * np.cos(SurfaceSolarAzimuth_north_rad) * np.sin(TiltAngle_north_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_north_rad)))
-    if SolarIncidenceAngle_north < 90:
-        SolarIncidenceAngle_north = SolarIncidenceAngle_north
-    else:
-        SolarIncidenceAngle_north = 90
-    return SolarIncidenceAngle_north
+    SolarIncidenceAngle_north_list = []
+    for i in range(0, len(SolarAltitudeAngle_deg)):
+
+        SurfaceSolarAzimuth_north_rad = np.radians(SolarAzimuthAngle[i] - SurfaceAzimuthAngle_north)
+
+        SolarAltitudeAngle_rad = np.radians(SolarAltitudeAngle_deg[i])
+
+        SolarIncidenceAngle_north = np.rad2deg(np.arccos(np.cos(SolarAltitudeAngle_rad) * np.cos(SurfaceSolarAzimuth_north_rad) * np.sin(TiltAngle_north_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_north_rad)))
+
+        if SolarIncidenceAngle_north < 90:
+            SolarIncidenceAngle_north = SolarIncidenceAngle_north      
+        else:
+            SolarIncidenceAngle_north = 90
+
+        SolarIncidenceAngle_north_list.append(SolarIncidenceAngle_north)
+
+    return SolarIncidenceAngle_north_list
 
 # Solar Incidence Angle East
-def Solar_incidence_angle_east(SurfaceAzimuthAngle_east, TiltAngle_deg_east, SolarAltitudeAngle_deg, SolarAzimuthAngle, n):
-    SolarAltitudeAngle_rad = np.radians(SolarAltitudeAngle_deg)
-    SurfaceSolarAzimuth_east_rad = np.radians(SolarAzimuthAngle - SurfaceAzimuthAngle_east)
+def Solar_incidence_angle_east(SurfaceAzimuthAngle_east, TiltAngle_deg_east, SolarAltitudeAngle_deg, SolarAzimuthAngle):
     TiltAngle_east_rad = np.radians(TiltAngle_deg_east)
-    SolarIncidenceAngle_east = np.rad2deg(np.arccos(SolarAltitudeAngle_rad * np.cos(SurfaceSolarAzimuth_east_rad) * np.sin(TiltAngle_east_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_east_rad)))
-    if SolarIncidenceAngle_east < 90:
-        SolarIncidenceAngle_east = SolarIncidenceAngle_east
-    else:
-        SolarIncidenceAngle_east = 90
-    return SolarIncidenceAngle_east
+    SolarIncidenceAngle_east_list = []
+    for i in range(0, len(SolarAltitudeAngle_deg)):
+        SolarAltitudeAngle_rad = np.radians(SolarAltitudeAngle_deg[i])
+        SurfaceSolarAzimuth_east_rad = np.radians(SolarAzimuthAngle[i] - SurfaceAzimuthAngle_east)
+    
+        SolarIncidenceAngle_east = np.rad2deg(np.arccos(np.cos(SolarAltitudeAngle_rad) * np.cos(SurfaceSolarAzimuth_east_rad) * np.sin(TiltAngle_east_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_east_rad)))
+        if SolarIncidenceAngle_east < 90:
+            SolarIncidenceAngle_east = SolarIncidenceAngle_east
+        else:
+            SolarIncidenceAngle_east = 90
+        SolarIncidenceAngle_east_list.append(SolarIncidenceAngle_east)
+
+    return SolarIncidenceAngle_east_list
 
 # Solar Incidence Angle West
-def Solar_incidence_angle_west(SurfaceAzimuthAngle_west, TiltAngle_deg_west, SolarAltitudeAngle_deg, SolarAzimuthAngle, n):
-    SolarAltitudeAngle_rad = np.radians(SolarAltitudeAngle_deg)
-    SurfaceSolarAzimuth_west_rad = np.radians(SolarAzimuthAngle - SurfaceAzimuthAngle_west)
+def Solar_incidence_angle_west(SurfaceAzimuthAngle_west, TiltAngle_deg_west, SolarAltitudeAngle_deg, SolarAzimuthAngle):
+    
     TiltAngle_west_rad = np.radians(TiltAngle_deg_west)
-    SolarIncidenceAngle_west = np.rad2deg(np.arccos(SolarAltitudeAngle_rad * np.cos(SurfaceSolarAzimuth_west_rad) * np.sin(TiltAngle_west_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_west_rad)))
-    if SolarIncidenceAngle_west < 90:
-        SolarIncidenceAngle_west = SolarIncidenceAngle_west
-    else:
-        SolarIncidenceAngle_west = 90
-    return SolarIncidenceAngle_west
+    SolarIncidenceAngle_west_list = []
+    for i in range(0, len(SolarAltitudeAngle_deg)):
+        SurfaceSolarAzimuth_west_rad = np.radians(SolarAzimuthAngle[i] - SurfaceAzimuthAngle_west)
+        SolarAltitudeAngle_rad = np.radians(SolarAltitudeAngle_deg[i])
+
+        SolarIncidenceAngle_west = np.rad2deg(np.arccos(np.cos(SolarAltitudeAngle_rad) * np.cos(SurfaceSolarAzimuth_west_rad) * np.sin(TiltAngle_west_rad) + np.sin(SolarAltitudeAngle_rad) * np.cos(TiltAngle_west_rad)))
+        if SolarIncidenceAngle_west < 90:
+            SolarIncidenceAngle_west = SolarIncidenceAngle_west
+        else:
+            SolarIncidenceAngle_west = 90
+        SolarIncidenceAngle_west_list.append(SolarIncidenceAngle_west)
+    return SolarIncidenceAngle_west_list
 
 # Calculate Daily extraterrestrial solar radiation in kw/m^2/day
 def H_bar_0(month, day, latitude, n):
