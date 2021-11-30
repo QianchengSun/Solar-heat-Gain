@@ -9,6 +9,7 @@ Smart Wi-Fi physics-informed thermostat enabled to estimation of residential pas
 
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 import sys
 package_path = r"/Users/qianchengsun/PhD/github/Solar-heat-Gain"
 sys.path.append(package_path)
@@ -29,6 +30,7 @@ the order of the orientation is North, South, West, and East
 df_house_15["declination_angle"] = pd.NA
 df_house_15["solar_altitude_angle"] = pd.NA
 df_house_15["solar_azimuth_angle"] = pd.NA
+# create solar incidence angle in different orientation
 df_house_15["solar_incidence_angle_north"] = pd.NA
 df_house_15["solar_incidence_angle_south"] = pd.NA
 df_house_15["solar_incidence_angle_west"] = pd.NA
@@ -72,21 +74,34 @@ T_air_indoor = (df_house_15["Temp"] - 32) * 5 / 9
 H_bar = df_house_15["All_sky_insolation_incident_on_horizontal_surface"]
 # Apply the solar function to data frame to obtain the solar radiation
 # combine hour and minutes together
-df_house_15["new_hour"] = df_house_15["Hour"] + df_house_15["Minutes"] / 60
+df_house_15["new_hour"] = np.round(df_house_15["Hour"] + df_house_15["Minutes"] / 60, decimals = 3)
 # calculate day_of_year
 df_house_15["day_of_year"] = sc.day_of_year(month = df_house_15["Month"],
                                             day = df_house_15["Day"])
+# declination angle
+df_house_15["declination_angle"] = np.round(sc.equation_of_time(month = df_house_15["Month"],
+                                                    day = df_house_15["Day"]), decimals = 3)
 # calculate solar time of the day
-df_house_15["solar_time"] = sc.Solar_time(hour = df_house_15["new_hour"],
+df_house_15["solar_time"] = np.round(sc.Solar_time(hour = df_house_15["new_hour"],
                                         GMT = GMT,
                                         long_local = Long_local,
-                                        n = df_house_15["day_of_year"])
-#%%
-"""GHI has bug"""
-df_house_15["GHI"] = sc.Solar_radiation_on_horizontal_GHI(month = df_house_15["Month"],
+                                        month = df_house_15["Month"],
+                                        day = df_house_15["Day"]), decimals = 3)
+# calculate the GHI (solar radiation on horizontal GHI)
+df_house_15["GHI"] = np.round(sc.Solar_radiation_on_horizontal_GHI(month = df_house_15["Month"],
                                                         day = df_house_15["Day"],
                                                         latitude = latitude,
                                                         H_bar = H_bar, 
-                                                        SolarTime = df_house_15["solar_time"])
+                                                        SolarTime = df_house_15["solar_time"]), decimals = 3)
+plt.plot(df_house_15["GHI"])
+# caclulate solar altitude angle
+df_house_15["solar_altitude_angle"] = sc.Solar_alitude_angle(latitude = latitude,
+                                                            DeclinationAngle = df_house_15["declination_angle"],
+                                                            SolarTime = df_house_15["solar_time"])
+# %% calculate solar azimuth angle
+df_house_15["solar_azimuth_angle"] = sc.Solar_azimuth_angle(latitude = latitude,
+                                                            DeclinationAngle = df_house_15["declination_angle"],
+                                                            SolarTime = df_house_15["solar_time"],
+                                                            SolarAltitudeAngle = df_house_15["solar_altitude_angle"])
 
 # %%

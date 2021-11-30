@@ -61,29 +61,30 @@ def day_of_year(month, day):
     return n_list 
 
 # Equation of time 
-def equation_of_time(n):
+def equation_of_time(month, day):
+    n = np.array(day_of_year(month, day))
     b =  np.radians((n - 1) * 360 / 365) # have to import math then use math.radians
     Equation_of_Time = 229.2 * (7.5 * 10 ** -5 + 0.001868 * np.cos(b) - 0.014615 * np.cos(2 * b) - 0.04089 * np.sin(2 * b))
     return Equation_of_Time
 
 # Solar Time
 
-def Solar_time(hour, GMT, long_local, n):
+def Solar_time(hour, GMT, long_local, month, day):
     Long_std = GMT * 15
-    E = equation_of_time(n)
+    E = equation_of_time(month, day)
     Long_local = long_local
     SolarTime = hour + (4 * (Long_local - Long_std) + E) / 60
     return SolarTime
 
 # Declination Angle
-def Declination_Angle(n):
+def Declination_Angle(month, day):
+    n = np.array(day_of_year(month, day))
     DeclinationAngle = 23.45 * np.sin(2 * np.pi * (284 + n) / 365)
     return DeclinationAngle
 
 # Sunset Angle
 def Sunset_Angle(month, day, latitude):
-    n = day_of_year(month, day)
-    Delta_deg = Declination_Angle(n)
+    Delta_deg = Declination_Angle(month, day)
     delta_rad = np.radians(Delta_deg)
     Lat_rad = np.radians(latitude)
     SunsetAngle = np.degrees(np.arccos(-np.tan(Lat_rad) * np.tan(delta_rad)))
@@ -98,41 +99,43 @@ def Hour_angle(SolarTime):
 def Solar_radiation_on_horizontal_GHI(month, day, latitude, H_bar, SolarTime):
     omega_deg = Sunset_Angle(month, day, latitude)  # the sunset angle in degrees
     omega_rad = np.radians(omega_deg)             # the sunset angle in radians
-    Hour_angle_rad = np.radians(Hour_angle(SolarTime))   # hour angle in radians
+    Hour_angle_rad = np.array(np.radians(Hour_angle(SolarTime)))   # hour angle in radians
     a = 0.409 + 0.5016 * np.sin(omega_rad - np.pi/3)      # constant in formula
     b = 0.6609 - 0.4767 * np.sin(omega_rad - np.pi/3)     # constant in formula
-    if Hour_angle_rad < omega_rad or Hour_angle_rad > omega_rad:
-        r_h = 0
-    else: 
-        r_h = np.pi / 24 * (a + b * np.cos(Hour_angle_rad)) * (np.cos(Hour_angle_rad) - np.cos(omega_rad))/(np.sin(omega_rad) - omega_rad * np.cos(omega_rad))
-    I_bar = r_h * H_bar
-    return I_bar
+    I_bar_list = []
+
+    for i in range(0, len(H_bar)):
+        if np.logical_or(Hour_angle_rad[i] < -omega_rad[i], Hour_angle_rad[i] > omega_rad[i]):
+            r_h = 0
+        else: 
+            r_h = np.pi / 24 * (a[i] + b[i] * np.cos(Hour_angle_rad[i])) * (np.cos(Hour_angle_rad[i]) - np.cos(omega_rad[i]))/(np.sin(omega_rad[i]) - omega_rad[i] * np.cos(omega_rad[i]))
+        I_bar = r_h * H_bar[i]
+        I_bar_list.append(I_bar)
+    return I_bar_list
 
 # Solar Alitude Angle
 def Solar_alitude_angle(latitude, DeclinationAngle, SolarTime):
     lat_rad = np.radians(latitude)
     delta_rad = np.radians(DeclinationAngle)
     Hour_angle_rad = np.radians(SolarTime)
-    SolarAltitudeAngle = np.rad2deg(np.asin(np.cos(lat_rad) * np.cos(Hour_angle_rad) + np.sin(lat_rad) * np.sin(delta_rad)))
+    SolarAltitudeAngle = np.rad2deg(np.arcsin(np.cos(lat_rad) * np.cos(Hour_angle_rad) + np.sin(lat_rad) * np.sin(delta_rad)))
     return SolarAltitudeAngle
 
 # Solar Azimuth Angle
 def Solar_azimuth_angle(latitude, DeclinationAngle, SolarTime, SolarAltitudeAngle):
-    Solar_alitude_angle_rad = np.radians(SolarAltitudeAngle)
+    SolarAzimuthAngle_list = []
+    SolarTime_array = np.array(SolarTime)
     lat_rad = np.radians(latitude)
-    delta_rad = np.radians(DeclinationAngle)
-    if SolarTime > 12:
-        SolarAzimuthAngle = np.rad2deg(np.arccos((np.sin(Solar_alitude_angle_rad) * np.sin(lat_rad) - np.sin(delta_rad)) / (np.cos(Solar_alitude_angle_rad) * np.cos(lat_rad))))
-    else:
-        SolarAzimuthAngle = np.rad2deg(np.arccos((np.sin(Solar_alitude_angle_rad) * np.sin(lat_rad) - np.sin(delta_rad)) / (np.cos(Solar_alitude_angle_rad) * np.cos(lat_rad))))* -1
-    return SolarAzimuthAngle 
-#%%
+    for i in range(0, len(DeclinationAngle)):
+        Solar_alitude_angle_rad = np.radians(SolarAltitudeAngle[i])
+        delta_rad = np.radians(DeclinationAngle[i])
+        if SolarTime_array[i] > 12:
+            SolarAzimuthAngle = np.rad2deg(np.arccos((np.sin(Solar_alitude_angle_rad) * np.sin(lat_rad) - np.sin(delta_rad)) / (np.cos(Solar_alitude_angle_rad) * np.cos(lat_rad))))
+        else:
+            SolarAzimuthAngle = np.rad2deg(np.arccos((np.sin(Solar_alitude_angle_rad) * np.sin(lat_rad) - np.sin(delta_rad)) / (np.cos(Solar_alitude_angle_rad) * np.cos(lat_rad))))* (-1)
+    SolarAzimuthAngle_list.append(SolarAzimuthAngle)
+    return SolarAzimuthAngle_list
 
-# Surface Azimuth Angle define
-SurfaceAzimuthAngle_south = 0
-SurfaceAzimuthAngle_north = 180
-SurfaceAzimuthAngle_west = 90
-SurfaceAzimuthAngle_east = -90
 
 # Solar Incidence Angle South 
 def Solar_incidence_angle_south(SurfaceAzimuthAngle_south, TiltAngle_deg_south, SolarAltitudeAngle_deg, SolarAzimuthAngle, n):
