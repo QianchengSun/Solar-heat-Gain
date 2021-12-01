@@ -215,32 +215,37 @@ def Solar_incidence_angle_west(SurfaceAzimuthAngle_west, TiltAngle_deg_west, Sol
     return SolarIncidenceAngle_west_list
 
 # Calculate Daily extraterrestrial solar radiation in kw/m^2/day
-def H_bar_0(month, day, latitude, n):
+def H_bar_0(month, day, latitude):
     Gsc = 1367
+    n = np.array(day_of_year(month, day))
     omega_deg = Sunset_Angle(month, day, latitude)
     omega_rad = np.radians(omega_deg)
     latitude_rad = np.radians(latitude)
-    Declination_Angle_deg = Declination_Angle(n)
+    Declination_Angle_deg = Declination_Angle(month, day)
     Declination_Angle_rad = np.radians(Declination_Angle_deg)
     Hbar_0 = 86400 * 2.77778 * (10 ** -7) * Gsc / np.pi * (1 + 0.033 * np.cos(2 * np.pi * n / 365)) * (np.cos(latitude_rad) * np.cos(Declination_Angle_rad) * np.sin(omega_rad) + omega_rad * np.sin(latitude_rad) * np.sin(Declination_Angle_rad))
     return Hbar_0
 
  # Calculate Monthly average daily diffuse solar radiation on horizontal (south)
-def H_bar_d_south(month, day, latitude, H_bar, TiltAngle_deg_south, n):
+def H_bar_d_south(month, day, latitude, H_bar, TiltAngle_deg_south):
     if latitude < 0 :
         TiltAngle_deg_south = -TiltAngle_deg_south
-    omega_deg = Sunset_Angle(month, day, latitude)
-   # omega_rad = math.radians(omega_deg)
-   # Declination_Angle_deg = Declination_Angle(n)
-   # Declination_Angle_rad = math.radians(Declination_Angle_deg)
     TiltAngle_south_rad = np.radians(TiltAngle_deg_south)
-    Hbar_0 = H_bar_0(month, day, latitude, n)
-    k_t = H_bar / Hbar_0
-    if omega_deg < 81.4 :
-        H_bar_d_south = max(0, (1.391 - 3.56 * k_t + 4.189 * k_t ** 2 - 2.137 * k_t ** 3) * H_bar * (1 + np.cos(TiltAngle_south_rad))/2 )
-    else:
-        H_bar_d_south = max(0, (1.311 - 3.022 * k_t + 3.427 * k_t ** 2 - 1.821 * k_t ** 3) * H_bar * ( 1 + np.cos(TiltAngle_south_rad))/2 )
-    return H_bar_d_south
+
+    H_bar_d_south_list = []
+    Hbar_0 = np.array(H_bar_0(month, day, latitude))
+    omega_deg = np.array(Sunset_Angle(month, day, latitude))
+
+    for i in range(0, len(omega_deg)):
+        k_t = H_bar[i] / Hbar_0[i]
+        if omega_deg[i] < 81.4 :
+            H_bar_d_south = np.max(0, ((1.391 - 3.56 * k_t + 4.189 * k_t ** 2 - 2.137 * k_t ** 3) * H_bar[i] * (1 + np.cos(TiltAngle_south_rad))/2) )
+        else:
+            H_bar_d_south = np.max(0, ((1.311 - 3.022 * k_t + 3.427 * k_t ** 2 - 1.821 * k_t ** 3) * H_bar[i] * ( 1 + np.cos(TiltAngle_south_rad))/2) )
+
+        H_bar_d_south_list.append(H_bar_d_south)
+
+    return H_bar_d_south_list
 
 # Calculate Monthly average daily diffuse solar radiation on horizontal (north)
 def H_bar_d_north(month, day, latitude, H_bar, TiltAngle_deg_north, n):
@@ -299,25 +304,38 @@ def H_bar_d_west(month, day, latitude, H_bar, TiltAngle_deg_west, n):
 #===================================
 
 # Calculate beam solar radiation (south)
-def Beam_solar_radiation_south(month, day, latitude, H_bar, SolarTime, SolarAltitudeAngle, SolarIncidenceAngle_south,TiltAngle_deg_south,n):
+def Beam_solar_radiation_south(month, 
+                                day, 
+                                latitude, 
+                                H_bar, 
+                                SolarTime, 
+                                SolarAltitudeAngle, 
+                                SolarIncidenceAngle_south,
+                                TiltAngle_deg_south):
+    I_bar_b_south_list = []
     omega_deg = Sunset_Angle(month, day, latitude)
-    omega_rad = np.radians(omega_deg)
-    HourAngle_rad = np.radians(Hour_angle(SolarTime))
-    Solar_Incidence_Angle_south_rad = np.radians(SolarIncidenceAngle_south)
-    SolarZeinthAngle_rad = np.radians(90 - SolarAltitudeAngle)
-    
-    r_b = np.cos(Solar_Incidence_Angle_south_rad)/np.cos(SolarZeinthAngle_rad)
-    if HourAngle_rad < - omega_rad or HourAngle_rad > omega_rad:
-        r_d = 0
-    else:
-        r_d = np.pi/24 * (np.cos(HourAngle_rad) - np.cos(omega_rad)) / (np.sin(omega_rad) - omega_rad * np.cos(omega_rad))
-    
-    H_bar_d_0_south = H_bar_d_south(month, day, latitude, H_bar, TiltAngle_deg_south, n)
-    I_bar_d_horizontal_south = r_d * H_bar_d_0_south
-    I_bar_horizontal = Solar_radiation_on_horizontal_GHI(month, day, latitude, H_bar, SolarTime)
-    I_bar_b_horizontal_south = I_bar_horizontal - I_bar_d_horizontal_south
-    I_bar_b_south = I_bar_b_horizontal_south * r_b
-    return I_bar_b_south
+    H_bar_d_0_south = np.array(H_bar_d_south(month, day, latitude, H_bar, TiltAngle_deg_south))
+    I_bar_horizontal = np.array(Solar_radiation_on_horizontal_GHI(month, day, latitude, H_bar, SolarTime))
+
+    for i in range(0, len(omega_deg)):
+        omega_rad = np.radians(omega_deg[i])
+        HourAngle_rad = np.radians(Hour_angle(SolarTime[i]))
+        Solar_Incidence_Angle_south_rad = np.radians(SolarIncidenceAngle_south[i])
+        SolarZeinthAngle_rad = np.radians(90 - SolarAltitudeAngle[i])
+        
+        r_b = np.cos(Solar_Incidence_Angle_south_rad)/np.cos(SolarZeinthAngle_rad)
+        if HourAngle_rad < - omega_rad or HourAngle_rad > omega_rad:
+            r_d = 0
+        else:
+            r_d = np.pi/24 * (np.cos(HourAngle_rad) - np.cos(omega_rad)) / (np.sin(omega_rad) - omega_rad * np.cos(omega_rad))
+        
+        I_bar_d_horizontal_south = r_d * H_bar_d_0_south[i]
+        I_bar_b_horizontal_south = I_bar_horizontal[i] - I_bar_d_horizontal_south
+        I_bar_b_south = I_bar_b_horizontal_south * r_b
+
+        I_bar_b_south_list.append(I_bar_b_south)
+
+    return I_bar_b_south_list
 
 
 # Calculate beam solar radiation (north)

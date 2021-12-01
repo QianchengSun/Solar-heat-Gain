@@ -142,5 +142,50 @@ df_house_15["solar_incidence_angle_east"] = sc.Solar_incidence_angle_east(Surfac
                                                                             TiltAngle_deg_east = TiltAngle_deg_east,
                                                                             SolarAltitudeAngle_deg = df_house_15["solar_altitude_angle"],
                                                                             SolarAzimuthAngle = df_house_15["solar_azimuth_angle"])    
-  
+
+# %%
+"""
+Beam solar radiation calculation has logic bug
+"""
+# calculate beam solar radiation
+# calculate beam solar radiation on South side
+df_house_15["beam_solar_radiation_south"] = sc.Beam_solar_radiation_south(month = df_house_15["Month"],
+                                                                        day = df_house_15["Day"],
+                                                                        latitude = latitude,
+                                                                        H_bar = H_bar,
+                                                                        SolarTime = df_house_15["solar_time"],
+                                                                        SolarAltitudeAngle = df_house_15["solar_altitude_angle"],
+                                                                        SolarIncidenceAngle_south = df_house_15["solar_incidence_angle_south"],
+                                                                        TiltAngle_deg_south = TiltAngle_deg_south)
+plt.plot(df_house_15["beam_solar_radiation_south"])
+# %%
+def H_bar_d_south(month, day, latitude, H_bar, TiltAngle_deg_south):
+    if latitude < 0 :
+        TiltAngle_deg_south = -TiltAngle_deg_south
+    TiltAngle_south_rad = np.radians(TiltAngle_deg_south)
+
+    H_bar_d_south_list = []
+    Hbar_0 = np.array(sc.H_bar_0(month, day, latitude))
+    omega_deg = np.array(sc.Sunset_Angle(month, day, latitude))
+
+    for i in range(0, len(month)):
+        k_t = H_bar[i] / Hbar_0[i]
+        if omega_deg[i] < 81.4 :
+            H_bar_d_south = np.max(0, ((1.391 - 3.56 * k_t + 4.189 * k_t ** 2 - 2.137 * k_t ** 3) * H_bar[i] * ( 1 + np.cos(TiltAngle_south_rad))/2) )
+        else:
+            H_bar_d_south = np.max(0, ((1.311 - 3.022 * k_t + 3.427 * k_t ** 2 - 1.821 * k_t ** 3) * H_bar[i] * ( 1 + np.cos(TiltAngle_south_rad))/2) )
+
+        H_bar_d_south_list.append(H_bar_d_south)
+
+    return H_bar_d_south_list
+#%%
+H_bar_d_south_value = H_bar_d_south(month = df_house_15["Month"],
+                                    day = df_house_15["Day"],
+                                    latitude = latitude,
+                                    H_bar = H_bar,
+                                    TiltAngle_deg_south = TiltAngle_deg_south)
+# %%
+sunset_angle = np.array(sc.Sunset_Angle(month = df_house_15["Month"], 
+                                    day = df_house_15["Day"],
+                                    latitude = latitude))
 # %%
