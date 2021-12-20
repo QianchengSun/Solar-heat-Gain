@@ -280,7 +280,7 @@ trainPredictPlot = np.empty(shape = (len(data), 1))
 trainPredictPlot[:, :] = np.nan
 # predicted data is depend on 3 parts : look_back, train, test
 trainPredictPlot[0 : look_back,:] = np.array(dataset["Temp"][0 : look_back]).reshape((look_back, 1))
-trainPredictPlot[(look_back + 1) : (train_index + look_back + 1), :] = trainPredict_scaleback
+trainPredictPlot[(look_back ) : (train_index + look_back), :] = trainPredict_scaleback
 trainPredictPlot[(train_index + look_back) : len(data) ] = testPredict_scaleback
 # shift test predictions for plotting
 originPlot = np.empty(shape = (len(data), 1))
