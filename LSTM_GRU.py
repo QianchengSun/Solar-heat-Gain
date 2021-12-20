@@ -19,6 +19,7 @@ import keras
 import sklearn
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_error
+import math
 
 # Data preprocessing
 """
@@ -100,6 +101,9 @@ test_y = target[train_index:len(data), :, :]
 
 # create and fit the LSTM
 model = tf.keras.Sequential()
+# LSTM layer build
+# Reference website:
+# https://www.tensorflow.org/api_docs/python/tf/keras/layers/LSTM
 model.add(tf.keras.layers.LSTM(units = 60,
             activation= "tanh",
             dropout = 0.2,
@@ -108,6 +112,13 @@ model.add(tf.keras.layers.LSTM(units = 60,
             input_shape = (look_back, n_input_feature),
             kernel_regularizer = tf.keras.regularizers.l1_l2(l1 = 0.01, l2 = 0.01),
             return_sequences = True))
+# Batch Normalization
+# Reference website:
+# https://arxiv.org/abs/1502.03167
+
+# Batch Normalization for LSTM model
+# Reference website
+# https://www.tensorflow.org/api_docs/python/tf/keras/layers/BatchNormalization
 model.add(tf.keras.layers.BatchNormalization())
 model.add(tf.keras.layers.LSTM(units = 35,
             activation= "tanh",
@@ -125,17 +136,50 @@ model.add(tf.keras.layers.LSTM(units = 10,
             kernel_regularizer = tf.keras.regularizers.l1_l2(l1 = 0.01, l2 = 0.01),
             return_sequences = False))
 model.add(tf.keras.layers.BatchNormalization())
+# dense layer for LSTM
+# Reference website :
+# https://www.tensorflow.org/api_docs/python/tf/keras/layers/Dense
 model.add(tf.keras.layers.Dense(units = 1, activation = "relu"))
 
 # loss function to do regression problems
 # Reference website
 # https://scikit-learn.org/stable/modules/model_evaluation.html
-model.compile(loss = "mean_absolute_error", optimizer = "adam")
+model.compile(loss = "mean_absolute_error", 
+            optimizer = "adam", 
+            metrics = [tf.keras.metrics.MeanAbsoluteError()])
 
 model.fit(x = sample[0:train_index, :, :],
         y = target[0: train_index, :, :],
-        epochs = 100, 
+        epochs = 5, 
         batch_size = 60,
-        verbose = 2)
+        validation_split = 0.2, # here setup the validation dataset
+        verbose = 2,
+        # setup the early stopping for machine learning model
+        # Reference website:
+        # https://keras.io/api/callbacks/early_stopping/
+        callbacks = tf.keras.callbacks.EarlyStopping(monitor = "loss",
+                                                    min_delta = 0,
+                                                    patience = 2,
+                                                    verbose = 1,
+                                                    mode = "auto",
+                                                    restore_best_weights = True))
+#%%
+# make predictions
+trainPredict = model.predict(train_x)
+# scale back the predictions
+trainPredict = scaler.inverse_transform(trainPredict)
+testPredict = model.predict(test_x)
+testPredict = scaler.inverse_transform(testPredict)
+
+#%%
+# Output the model result
+trainY = train_y.reshape((len(train_y), 1))
+# calculate Mean squared error
+train_score = mean_absolute_error(trainY, trainPredict[:,0])
+print("Train Score : MAE:", (train_score))
+testY = test_y.reshape((len(test_y), 1))
+test_score = mean_absolute_error(testY, testPredict[:,0])
+print("Test score : MAE :", (test_score))
+
 
 # %%
