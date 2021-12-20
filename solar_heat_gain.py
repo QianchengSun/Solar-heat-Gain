@@ -11,7 +11,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
-package_path = r"/Users/qianchengsun/PhD/github/Solar-heat-Gain"
+import os 
+package_path = os.path.join(__file__)
 sys.path.append(package_path)
 import solar_calculation as sc
 
