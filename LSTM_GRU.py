@@ -273,7 +273,7 @@ print("Train Score : R-squared value :", (train_r2))
 test_r2 = r2_score(testY_scaleback[:,0], testPredict_scaleback[:,0])
 print("Test Score : R-squared value :", (test_r2))
 
-# %%
+
 # plot the model result 
 # create an empty array for Predicted value
 trainPredictPlot = np.empty(shape = (len(data), 1))
