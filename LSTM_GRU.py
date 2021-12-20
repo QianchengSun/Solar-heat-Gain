@@ -274,3 +274,26 @@ test_r2 = r2_score(testY_scaleback[:,0], testPredict_scaleback[:,0])
 print("Test Score : R-squared value :", (test_r2))
 
 # %%
+# plot the model result 
+# create an empty array for Predicted value
+trainPredictPlot = np.empty(shape = (len(data), 1))
+trainPredictPlot[:, :] = np.nan
+# predicted data is depend on 3 parts : look_back, train, test
+trainPredictPlot[0 : look_back,:] = np.array(dataset["Temp"][0 : look_back]).reshape((look_back, 1))
+trainPredictPlot[(look_back + 1) : (train_index + look_back + 1), :] = trainPredict_scaleback
+trainPredictPlot[(train_index + look_back) : len(data) ] = testPredict_scaleback
+# shift test predictions for plotting
+originPlot = np.empty(shape = (len(data), 1))
+originPlot[:, :] = np.array(dataset["Temp"]).reshape((len(data), 1))
+# create plot for the prediction vs actual
+plt.plot(trainPredictPlot, color = "green", label = "Predicted_Indoor_Temperature F")
+plt.plot(originPlot, color = "red", label = "Actual_Indoor_Temperature F")
+plt.title("Predicted Temperature vs Actual Temperature")
+plt.xlabel("index value")
+plt.ylabel("Temperature F ")
+plt.legend()
+plt.show()
+
+
+
+# %%
