@@ -60,7 +60,7 @@ solar heat gain for any residence. Energy and Buildings, 261, 111934. https://do
 
 # Contact:
 The solar calculation package is being developed by Sun, Q. ,and Huang, K. from Renewable and Clean Energy Research Lab at University of Dayton.
-The LSTM & GRU machine learning model is developed by Sun, Q., Alhamayani, A. ,and Huang, K. from Renewable and Clean Energy Research Lab at University of Dayton.
+
 
 
 
