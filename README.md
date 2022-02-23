@@ -1,6 +1,7 @@
 # Smart Wi-Fi physics-informed thermostat enabled estimation of residential passive solar heat gain for any residence
 # Passive solar heat gain estimation
 
+# Short Introduction
 In this repository, it shows the pipeline about how to calculate the solar radiation based on the Latitude and Longitude of the target location.
 Here, there are two version of the solar radiation calculation:
 
@@ -13,12 +14,12 @@ This is the python version of the solar radiation calculation.
 In order to use this code, you have to access the hourly data from NASA power website.
 Reference link: https://power.larc.nasa.gov/
 
-How to use this repository
+# How to use this repository
 
 1. Download this repository to your local file 
-'''
+```
 git clone https://github.com/QianchengSun/Solar-heat-Gain.git
-'''
+```
 2. R version:
 You can load the R-script and the dataset in your Rstudio.
 Inputs need to change:
@@ -28,15 +29,15 @@ Inputs need to change:
 4). file_path (output)
 
 3. Python version:
-'''
+```
 import os 
 import sys
 solar_calculation_path = os.path.join(__file__)
 sys.path.append(solar_calculation_path)
 import solar_calculation as sc
-'''
+```
 
-Abstract:
+# Abstract:
 
 Here, we address the opportunity to find buildings with high solar heat gain and thus cooling requirements, in order to identify candidate buildings for shading 
 technologies. Prior studies have theoretically documented derived estimates of solar heat gain to buildings, both through heat transport through the envelope and 
@@ -51,11 +52,11 @@ gain for the targeted residences ranged from 48% to 72%, dependent upon both the
 developed here can be implemented in any residence in which smart Wi-Fi thermostats exist.
 
 
-Reference:
+# Reference:
 Sun, Q., Alhamayani, A., Huang, K., Hao, L., Hallinan, K., & Ghareeb, A. (2022). Smart wi-fi physics-informed thermostat enabled estimation of residential passive 
 solar heat gain for any residence. Energy and Buildings, 261, 111934. https://doi.org/10.1016/j.enbuild.2022.111934 
 
-Contact:
+# Contact:
 The package is being developed by Qiancheng Sun and Kefan Huang from Renewable and Clean Energy Research Lab at University of Dayton.
 
 
