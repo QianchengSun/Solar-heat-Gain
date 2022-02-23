@@ -22,11 +22,14 @@ git clone https://github.com/QianchengSun/Solar-heat-Gain.git
 ```
 2. R version:
 You can load the R-script and the dataset in your Rstudio.
-Inputs need to change:
-1). Latitude
-2). Longitude
-3). file_path (input)
-4). file_path (output)
+
+```
+# Inputs need to change:
+# 1). Latitude
+# 2). Longitude
+# 3). file_path (input)
+# 4). file_path (output)
+```
 
 3. Python version:
 ```
