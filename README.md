@@ -1,5 +1,4 @@
 # Smart Wi-Fi physics-informed thermostat enabled estimation of residential passive solar heat gain for any residence
-# Passive solar heat gain estimation
 
 # Short Introduction
 In this repository, it shows the pipeline about how to calculate the solar radiation based on the Latitude and Longitude of the target location.
