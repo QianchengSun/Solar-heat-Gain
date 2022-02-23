@@ -59,7 +59,8 @@ Sun, Q., Alhamayani, A., Huang, K., Hao, L., Hallinan, K., & Ghareeb, A. (2022).
 solar heat gain for any residence. Energy and Buildings, 261, 111934. https://doi.org/10.1016/j.enbuild.2022.111934 
 
 # Contact:
-The package is being developed by Qiancheng Sun and Kefan Huang from Renewable and Clean Energy Research Lab at University of Dayton.
+The solar calculation package is being developed by Sun, Q. ,and Huang, K. from Renewable and Clean Energy Research Lab at University of Dayton.
+The LSTM & GRU machine learning model is developed by Sun, Q., Alhamayani, A. ,and Huang, K. from Renewable and Clean Energy Research Lab at University of Dayton.
 
 
 
